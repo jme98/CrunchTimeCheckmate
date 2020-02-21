@@ -1,0 +1,10 @@
+INSTRUCTIONS FOR EVERYONE:
+--Please install the following libraries in your env to ensure compatibility.
+--To keep track of what you do and don't have already installed, add your name to the list
+in the parentheses after the library name when you have done so.
+--Whenever you install a library to your local copy of the project, add it to the end of the list.
+--If you uninstall/remove a library, please note that in all-capital letters after the parentheses,
+e.g. "django (Jennifer, Jessica, David) REMOVED BY DAVID"
+
+LIBRARIES:
+-- lxml (Jennifer)

@@ -1,1 +1,0 @@
-# Test Bookstore screenscraping happens in this file

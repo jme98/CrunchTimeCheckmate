@@ -8,7 +8,7 @@
 
 class SiteBookData:
     book_format = "" # DIGITAL, PRINT, or AUDIOBOOK
-    book_image # Pillow image of cover
+    book_image = None # Pillow image of cover
     book_image_url = "" # direct URL to cover
     isbn_13 = "" # ISBN (may be converted from ISBN-10)
     description = "" # book description fount at site
@@ -24,6 +24,9 @@ class SiteBookData:
     ready_for_sale = False # boolean; is this book currently purchasable at this site?
     extra = {} # dictionary of any other relevant data provided by the BookSite
 
+    def __init__(self):
+        pass
+
 
 '''
 get_book_site(slug)
@@ -38,3 +41,4 @@ book_site.find_book_matches_at_site(book_data)
 book_site.convert_book_id_to_url(book_id)
 # type: (str) -> str
 """Given a book_id, return the direct URL for the book."""
+'''

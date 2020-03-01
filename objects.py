@@ -27,6 +27,23 @@ class SiteBookData:
     def __init__(self):
         pass
 
+    def __str__(self):
+        mystr = "Format: " + self.book_format + "\n"
+        mystr += "Image Url: " + self.book_image_url + "\n"
+        mystr += "ISBN-13: " + self.book_image_url + "\n\n"
+        mystr += "Description: \n" + self.description + "\n\n"
+        mystr += "Series: " + self.series + "\n"
+        mystr += "Title: " + self.title + "\n"
+        mystr += "Subtitle: " + self.subtitle + "\n"
+        mystr += "Authors: \n"
+        for a in self.authors:
+            mystr += "    " + a + "\n"
+        mystr += "Book ID: " + self.book_id + "\n"
+        mystr += "Site Slug: " + self.site_slug + "\n"
+        mystr += "URL: " + self.url + "\n"
+        mystr += "RFS: " + str(self.ready_for_sale) + "\n"
+        mystr += "Parse Status: " + self.parse_status + "\n\n\n"
+        return mystr
 
 '''
 get_book_site(slug)

@@ -27,11 +27,7 @@ function global:deactivate ([switch]$NonDestructive) {
 
 deactivate -nondestructive
 
-<<<<<<< HEAD
 $env:VIRTUAL_ENV="C:\Users\rtd7\Documents\CT2\env"
-=======
-$env:VIRTUAL_ENV="C:\Users\david\Desktop\S20\SE5\Project\Repos\Checkmate\env"
->>>>>>> master
 
 if (! $env:VIRTUAL_ENV_DISABLE_PROMPT) {
     # Set the prompt to include the env name

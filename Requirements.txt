@@ -9,3 +9,4 @@ e.g. "django (Jennifer, Jessica, David) REMOVED BY DAVID"
 LIBRARIES:
 -- lxml (Jennifer, David)
 -- requests (David)
+-- Pillow (David)

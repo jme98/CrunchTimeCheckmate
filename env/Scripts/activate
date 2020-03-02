@@ -37,7 +37,11 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
+<<<<<<< HEAD
 VIRTUAL_ENV="C:\Users\rtd7\Documents\CT2\env"
+=======
+VIRTUAL_ENV="C:\Users\david\Desktop\S20\SE5\Project\Repos\Checkmate\env"
+>>>>>>> master
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

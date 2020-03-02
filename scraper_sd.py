@@ -4,7 +4,8 @@ from objects import *
 from PIL import Image
 
 def scrape_lc(book_id):
-    url = 'https://www3.livrariacultura.com.br/' + book_id
+    url = 'https://www.scribd.com/' + book_id
+    open('sdsample.txt', 'wb').write(requests.get(url).content)
     return requests.get(url)
     
 def parse_lc(response, book_id):
@@ -14,13 +15,13 @@ def parse_lc(response, book_id):
     data = SiteBookData()
 
     try:
-        data.book_format = root.xpath("//td[@class='value-field Formato']")[0].text
+        data.book_format = root.xpath("//meta[@property='og:type']/@content")[0]
     except:
         data.book_format = ""
         parsed = False
 
     try:
-        data.book_image_url = root.xpath("//img[@id='image-main']/@src")[0]
+        data.book_image_url = root.xpath("//meta[@property='og:image']/@content")[0]
         rspns = requests.get(data.book_image_url, stream=True)
         rspns.raw.decode_content = True
         data.book_image = Image.open(rspns.raw)
@@ -29,36 +30,33 @@ def parse_lc(response, book_id):
         data.book_image = ""
 
     try:
-        data.isbn_13 = root.xpath("//td[@class='value-field ISBN']")[0].text
+        data.isbn_13 = root.xpath("//meta[@property='books:isbn']/@content")[0]
     except:
         data.isbn_13 = ""
         parsed = False
 
     try:
-        data.description = root.xpath("//td[@class='value-field Sinopse']")[0].text
+        data.description = root.xpath("//meta[@name='twitter:description']/@content")[0]
     except:
         data.description = ""
         parsed = False
 
     try:
-        data.title = root.xpath("//h1[@class='title_product']/div")[0].text
+        data.title = root.xpath("//meta[@property='og:title']/@content")[0]
     except:
         data.title = ""
         parsed = False
 
+    data.authors = root.xpath("//span[@class='author']/descendant::*/text()")
     try:
-        data.subtitle = root.xpath("//span[@class='subtitle']")[0].text
+        data.authors = data.authors[1:]
     except:
-        data.subtitle = ""
-
-    data.authors = root.xpath("//td[@class='value-field Colaborador']/text()")
-    if data.authors == []:
         parsed = False
 
-    data.ready_for_sale = root.xpath("//button[@class='buy-in-page-button']") != []
+    data.ready_for_sale = False
     
     data.book_id = book_id
-    data.site_slug = 'https://www3.livrariacultura.com.br/'
+    data.site_slug = 'https://www.scribd.com/'
     data.url = data.site_slug + data.book_id
     data.content = response.content
 
@@ -66,8 +64,8 @@ def parse_lc(response, book_id):
         data.parse_status = "FULLY_PARSED"
     else:
         data.parse_status = "UNSUCCESSFUL"
-    print(data.parse_status)
+    data.book_image.show()
 
-book_id = 'lord-of-the-rings-the-2639390/p'
-response = scrape_lc(book_id)
-sbd = parse_lc(response, book_id)
+book_id = 'book/295105408/The-MacArthur-Study-Bible'
+root = scrape_lc(book_id)
+sbd = parse_lc(root, book_id)

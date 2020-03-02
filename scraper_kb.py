@@ -17,7 +17,7 @@ def get_image(image_url):
     rspns.raw.decode_content = True
     return Image.open(rspns.raw)
 
-def parse(content, book_id):
+def parse(sb_data, content, book_id):
     parser = etree.HTMLParser(remove_pis=True)
     tree = etree.parse(io.BytesIO(content), parser)
     root = tree.getroot()
@@ -46,9 +46,6 @@ def parse(content, book_id):
         parse_status =  'UNSUCCESSFULL'
 
 
-
-
-
     try:
         series = root.xpath('.//span[@class="series product-field"]/span[@class="product-sequence-field"]/descendant::*/text()')[0] # all authors for the work
     except:
@@ -61,24 +58,29 @@ def parse(content, book_id):
 
 #    book_id = book_id # page identifier (used to reconstruct direct page URL), MAY NOT BE ISBN!
     site_slug = 'https://www.kobo.com/us/en/' # slug for the BookSite
-    book_image_url = 'https:' + root.xpath('.//img[@class="cover-image  notranslate_alt"]/@src')[0] # direct URL to cover
-    book_image =  get_image(book_image_url)     # Pillow image of cover
-    book_image.show()
+    try:
+        book_image_url = 'https:' + root.xpath('.//img[@class="cover-image  notranslate_alt"]/@src')[0] # direct URL to cover
+        book_image =  get_image(book_image_url)     # Pillow image of cover
+    except:
+        print('book image errors occured')
+    # book_image.show()
 
     url = site_slug + book_id  # final, direct URL to the book page
 #    content = "" #html content of the parsed page
     ready_for_sale = True  # boolean; is this book currently purchasable at this site?
     extra = {} # dictionary of any other relevant data provided by the BookSite
 
+#set site book data object here
+    
 
     
     return book_format + '\n' + isbn_13 + '\n' + description_content + '\n' + series + '\n' + title + '\n' + subtitle + '\n' + authors_content + '\n' + book_id + '\n' + site_slug + '\n' + url + '\n' + book_image_url
 
 
-x = scrape_kb('ebook/i-am-n')
-print(parse(x, 'ebook/i-am-n'))
+#x = scrape_kb('ebook/i-am-n')
+#print(parse(x, 'ebook/i-am-n'))
 
-y = scrape_kb('audiobook/the-warsaw-protocol')
-print(parse(y, 'audiobook/the-warsaw-protocol'))
+#y = scrape_kb('audiobook/the-warsaw-protocol')
+#print(parse(y, 'audiobook/the-warsaw-protocol'))
 
 #audiobook/the-warsaw-protocol

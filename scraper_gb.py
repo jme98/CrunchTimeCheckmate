@@ -23,8 +23,19 @@ def parse(book_id, response):
     data.book_image_url = root.xpath(".//link[@rel='image_src']")[0].get("href")
     stuff = root.xpath(".//span[@dir='ltr']")
     p = root.xpath(".//a[@id='gb-get-book-content']")[0].text
-    print(p)
-    
+
+    data.ready_for_sale = False
+    data.book_format = None
+    if "buy" in p.lower():
+        data.ready_for_sale = True
+        if "ebook" in p.lower():
+            data.book_format = "DIGITAL"
+    elif "get print" in p.lower():
+        data.ready_for_sale = True
+        data.book_format = "PRINT"
+    print(data.ready_for_sale)
+    print(data.book_format)
+
     
     count = 0
     author_start = 0
@@ -62,8 +73,6 @@ def parse(book_id, response):
             data.subtitle = ""
     data.isbn_13 = isbn_str
     data.content = response
-    data.ready_for_sale = None
-    data.book_format = None
     data.parse_status = "FULLY_PARSED"
 
     try:
@@ -76,8 +85,8 @@ def parse(book_id, response):
 id = "LhTuQAAACAAJ" #artemis fowl and the time paradox - series
 id = "dWALVMNK5kkC" #click - multiple authors
 id = "orb2rQEACAAJ" #tess a pure woman - subtitle
-id = "kTH6zAEACAAJ" #hp and the philosopher's stone - series
-id = "PocJx9t4wbUC" #ranger's apprentice - series
+#id = "kTH6zAEACAAJ" #hp and the philosopher's stone - series
+#id = "PocJx9t4wbUC" #ranger's apprentice - series
 id = "ykZK_50nUOAC" #mercy blade - price
 
 res = scrape_gb(id)

@@ -16,6 +16,17 @@ def get_image(image_url):
     rspns.raw.decode_content = True
     return Image.open(rspns.raw)
 
+#terms is assumed to contain a string of search terms separated by whitespace characters
+#tested: gets the proper page
+def search(terms):
+    url = 'https://www.kobo.com/us/en/'
+    for x in terms:
+        if x.isspace():
+            x = '+'
+    url += 'search?query=' + terms
+    response = requests.get(url)
+    print(response.content)
+
 def parse(content, book_id):
     parser = etree.HTMLParser(remove_pis=True)
     tree = etree.parse(io.BytesIO(content), parser)
@@ -74,3 +85,4 @@ def parse(content, book_id):
 #parse(x, 'ebook/i-am-n')
 #y = scrape_kb('audiobook/the-warsaw-protocol')
 #parse(y, 'audiobook/the-warsaw-protocol')
+search('i am n')

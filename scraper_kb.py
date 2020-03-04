@@ -27,6 +27,26 @@ def search(terms):
     response = requests.get(url)
     print(response.content)
 
+#def evaluate_potential_match(self, baseline, match):
+#    value = 0
+#    if baseline.isbn_13 == match.isbn_13:
+#        value += 1/2
+#    if baseline.title == match.title:
+#        value += 1/4
+#    if baseline.authors == match.authors:
+#        value += 1/8
+#    if baseline.book_format == match.book_format:
+#        value += 1/16
+#    if baseline.subtitle == match.subtitle:
+#        value += 1/32
+#    if baseline.series == match.series:
+#        value += 1/64
+#    if baseline.description == match.description:
+#        value += 1/128
+#    if baseline.book_image == match.book_image:
+#        value += 1/128
+#    return value
+
 def parse(content, book_id):
     parser = etree.HTMLParser(remove_pis=True)
     tree = etree.parse(io.BytesIO(content), parser)

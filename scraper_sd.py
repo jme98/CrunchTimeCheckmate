@@ -2,70 +2,128 @@ import requests
 from lxml import etree
 from objects import *
 from PIL import Image
+class Scribd:
+    #region fields
+    slug = 'sd'
+    base = 'https://www.scribd.com/'
+    stripped = 'www.scribd.com' #url base, but stripped of surrounding 'https://' and '/'
+    #endregion
 
-def scrape_lc(book_id):
-    url = 'https://www.scribd.com/' + book_id
-    open('sdsample.txt', 'wb').write(requests.get(url).content)
-    return requests.get(url)
-    
-def parse_lc(response, book_id):
-    parsed = True
+    def get_book_data_from_site(self, url):
+        response = requests.get(url)
+        root = etree.fromstring(response.content, etree.HTMLParser())
+        data = SiteBookData()
 
-    root = etree.fromstring(response.content, etree.HTMLParser())
-    data = SiteBookData()
+        data.book_format = _find_book_format(root)
+        data.book_image_url = _find_book_image_url(root)
+        data.book_image = _find_book_image(data.book_image_url)
+        data.isbn_13 = _find_isbn_13(root)
+        data.description = _find_description(root)
+        data.title = _find_title(root)
+        data.subtitle = _find_subtitle(root)
+        data.authors = _find_authors(root)
 
-    try:
-        data.book_format = root.xpath("//meta[@property='og:type']/@content")[0]
-    except:
-        data.book_format = ""
-        parsed = False
+        data.ready_for_sale = _find_ready_for_sale(root)
+        data.book_id = url.strip('https://').strip(self.stripped).strip('/')
+        data.site_slug = self.slug
+        data.url = url
+        data.content = response.content
+        data.parse_status = _find_parse_status(data)
 
-    try:
-        data.book_image_url = root.xpath("//meta[@property='og:image']/@content")[0]
-        rspns = requests.get(data.book_image_url, stream=True)
-        rspns.raw.decode_content = True
-        data.book_image = Image.open(rspns.raw)
-    except:
-        data.book_image_url = ""
-        data.book_image = ""
+        return data
 
-    try:
-        data.isbn_13 = root.xpath("//meta[@property='books:isbn']/@content")[0]
-    except:
-        data.isbn_13 = ""
-        parsed = False
+    def find_book_matches_at_site(self, book_data):
+        pass
 
-    try:
-        data.description = root.xpath("//meta[@name='twitter:description']/@content")[0]
-    except:
-        data.description = ""
-        parsed = False
+    def convert_book_id_to_url(self, book_id):
+        return self.base + book_id
 
-    try:
-        data.title = root.xpath("//meta[@property='og:title']/@content")[0]
-    except:
-        data.title = ""
-        parsed = False
-
-    data.authors = root.xpath("//span[@class='author']/descendant::*/text()")
-    try:
-        data.authors = data.authors[1:]
-    except:
-        parsed = False
-
-    data.ready_for_sale = False
-    
-    data.book_id = book_id
-    data.site_slug = 'https://www.scribd.com/'
-    data.url = data.site_slug + data.book_id
-    data.content = response.content
-
-    if (parsed):
-        data.parse_status = "FULLY_PARSED"
+#region parse subfunctions
+def _find_parse_status(data):
+    if data.book_format != "" and data.isbn_13 != "" and data.description != "" and data.title != "" and data.authors != []:
+        return "FULLY_PARSED"
     else:
-        data.parse_status = "UNSUCCESSFUL"
-    data.book_image.show()
+        return "UNSUCCESSFUL"
 
-book_id = 'book/295105408/The-MacArthur-Study-Bible'
-root = scrape_lc(book_id)
-sbd = parse_lc(root, book_id)
+def _find_book_format(root):
+    try:
+        book_format = root.xpath("//meta[@property='og:type']/@content")[0]
+        if book_format != None:
+            if book_format == 'book':
+                return 'DIGITAL'
+            else:
+                return 'AUDIOBOOK'
+        else:
+            return ""
+    except:
+        return ""
+    
+def _find_book_image_url(root):
+    try:
+        book_image_url = root.xpath("//meta[@property='og:image']/@content")[0]
+        if book_image_url != None:
+            return book_image_url
+        else:
+            return ""
+    except:
+        return ""
+
+def _find_book_image(url):
+    try:
+        rspns = requests.get(url, stream=True)
+        rspns.raw.decode_content = True
+        book_image = Image.open(rspns.raw)
+        return book_image
+    except:
+        return None
+
+def _find_isbn_13(root):
+    try:
+        isbn_13 = root.xpath("//meta[@property='books:isbn']/@content")[0]
+        if isbn_13 != None:
+            return isbn_13
+        else:
+            return ""
+    except:
+        return ""
+
+def _find_description(root):
+    try:
+        description = root.xpath("//meta[@name='twitter:description']/@content")[0]
+        if description != None:
+            return description
+        else:
+            return ""
+    except:
+        return ""
+
+def _find_title(root):
+    try:
+        title = root.xpath("//meta[@property='og:title']/@content")[0]
+        if title != None:
+            return title
+        else:
+            return ""
+    except:
+        return ""
+
+def _find_subtitle(root):
+    try:
+        subtitle = root.xpath("//span[@class='subtitle']")[0].text
+        if subtitle != None:
+            return subtitle
+        else:
+            return ""
+    except:
+        return ""
+
+def _find_authors(root):
+    authors = root.xpath("//span[@class='author']/descendant::*/text()")
+    if len(authors) > 1:
+        return authors[1:]
+    else:
+        return []
+
+def _find_ready_for_sale(root):
+    return None
+#endregion

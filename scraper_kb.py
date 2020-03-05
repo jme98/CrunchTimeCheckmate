@@ -11,41 +11,62 @@ def scrape_kb(book_id):
     return response.content
 
 def get_image(image_url):
-    print(image_url)
     rspns = requests.get(image_url, stream=True)
     rspns.raw.decode_content = True
     return Image.open(rspns.raw)
 
 #terms is assumed to contain a string of search terms separated by whitespace characters
 #tested: gets the proper page
-def search(terms):
+def search(search_terms):
     url = 'https://www.kobo.com/us/en/'
-    for x in terms:
+    for x in search_terms:
         if x.isspace():
             x = '+'
-    url += 'search?query=' + terms
+    url += 'search?query=' + search_terms
     response = requests.get(url)
-    print(response.content)
+    parser = etree.HTMLParser(remove_pis=True)
+    tree = etree.parse(io.BytesIO(response.content), parser)
+    root = tree.getroot()
+    result_urls = root.xpath(".//div[@class='item-detail']/div[@class='item-info']/p[@class='title product-field']/a/@href")
+    
+    return result_urls
 
-#def evaluate_potential_match(self, baseline, match):
-#    value = 0
-#    if baseline.isbn_13 == match.isbn_13:
-#        value += 1/2
-#    if baseline.title == match.title:
-#        value += 1/4
-#    if baseline.authors == match.authors:
-#        value += 1/8
-#    if baseline.book_format == match.book_format:
-#        value += 1/16
-#    if baseline.subtitle == match.subtitle:
-#        value += 1/32
-#    if baseline.series == match.series:
-#        value += 1/64
-#    if baseline.description == match.description:
-#        value += 1/128
-#    if baseline.book_image == match.book_image:
-#        value += 1/128
-#    return value
+
+def evaluate_search_results(search_urls, searched_book_data):
+    parsed_book_data = []
+    search_evaluations = []
+    i = 0
+    #make sure x is content
+    for x in search_urls:
+        response = requests.get(x)
+        parsed_book_data.append(parse(response.content, x.strip('https://www.kobo.com/us/en/')))
+        search_evaluations.append(evaluate_potential_match(searched_book_data, parsed_book_data[i]))
+        i += 1
+    
+    result_data = (parsed_book_data, search_evaluations)
+
+    return result_data
+    
+   
+def evaluate_potential_match(baseline, match):
+    value = 0
+    if baseline.isbn_13 == match.isbn_13:
+        value += 1/2
+    if baseline.title == match.title:
+        value += 1/4
+    if baseline.authors == match.authors:
+        value += 1/8
+    if baseline.book_format == match.book_format:
+        value += 1/16
+    if baseline.subtitle == match.subtitle:
+        value += 1/32
+    if baseline.series == match.series:
+        value += 1/64
+    if baseline.description == match.description:
+        value += 1/128
+    if baseline.book_image == match.book_image:
+        value += 1/128
+    return value
 
 def parse(content, book_id):
     parser = etree.HTMLParser(remove_pis=True)
@@ -101,8 +122,10 @@ def parse(content, book_id):
     return data
 
 #test cases:
-#x = scrape_kb('ebook/i-am-n')
-#parse(x, 'ebook/i-am-n')
+
 #y = scrape_kb('audiobook/the-warsaw-protocol')
 #parse(y, 'audiobook/the-warsaw-protocol')
-search('i am n')
+x = scrape_kb('ebook/i-am-n')
+results = evaluate_search_results(search('i am n'), parse(x, 'ebook/i-am-n'))
+for x in results[1]:
+    print(x)

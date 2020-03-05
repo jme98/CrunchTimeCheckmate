@@ -7,7 +7,6 @@ class Kobo(BookSite):
     def __init__(self):
         self.slug = 'kb'
         self.base = 'https://www.kobo.com/us/en/'
-        self.stripped = 'www.kobo.com/us/en'
         self.search = 'search'
 
     def _construct_params_of_search(self, book_data):

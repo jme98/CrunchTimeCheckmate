@@ -13,10 +13,10 @@ class BookSite:
     def __init__(self):
         self.slug = 'bs'
         self.base = 'https://book.site.url/'
-        self.stripped = 'book.site.url'
         self.search = 'find/'
 
     def get_book_data_from_site(self, url):
+        print(url)
         response = requests.get(url)
         root = etree.fromstring(response.content, etree.HTMLParser())
         data = SiteBookData()
@@ -32,7 +32,7 @@ class BookSite:
         data.authors = self._find_authors(root)
         
         data.ready_for_sale = self._find_ready_for_sale(root)
-        data.book_id = url.strip('https://').strip(self.stripped).strip('/')
+        data.book_id = url[len(self.base):]
         data.site_slug = self.slug
         data.url = url
         data.content = response.content

@@ -7,7 +7,6 @@ class Scribd(BookSite):
     def __init__(self):
         self.slug = 'sd'
         self.base = 'https://www.scribd.com/'
-        self.stripped = 'www.scribd.com'
         self.search = 'search'
 
     #overriding super function because isbn-13 and title/author cannot be searched together on scribd

@@ -7,7 +7,6 @@ class LivrariaCultura(BookSite):
     def __init__(self):
         self.slug = 'lc'
         self.base = 'https://www3.livrariacultura.com.br/'
-        self.stripped = 'www3.livrariacultura.com.br'
         self.search = 'busca/'
 
     def _construct_params_of_search(self, book_data):

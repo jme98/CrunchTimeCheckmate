@@ -7,6 +7,8 @@ BookSites are referenced as follows:
    sd = Scribd
 """
 
+import string
+
 class SiteBookData:
     book_format = "" # DIGITAL, PRINT, or AUDIOBOOK
     book_image = None # Pillow image of cover
@@ -25,9 +27,44 @@ class SiteBookData:
     ready_for_sale = False # boolean; is this book currently purchasable at this site?
     extra = {} # dictionary of any other relevant data provided by the BookSite
 
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        mystr = self.title
+        mystr += " " + self.isbn_13
+        for a in self.authors:
+            mystr += " " + a
+        return mystr.strip(".,' ")
+
+    def pr(self):
+        mystr = "Format: " + self.book_format + "\n"
+        mystr += "Image Url: " + self.book_image_url + "\n"
+        mystr += "ISBN-13: " + self.isbn_13 + "\n\n"
+        mystr += "Description: \n" + self.description + "\n\n"
+        mystr += "Series: " + self.series + "\n"
+        mystr += "Title: " + self.title + "\n"
+        mystr += "Subtitle: " + self.subtitle + "\n"
+        mystr += "Authors: \n"
+        for a in self.authors:
+            mystr += "    " + a.strip("., ") + "\n"
+        mystr += "Book ID: " + self.book_id + "\n"
+        mystr += "Site Slug: " + self.site_slug + "\n"
+        mystr += "URL: " + self.url + "\n"
+        mystr += "RFS: " + str(self.ready_for_sale) + "\n"
+        mystr += "Parse Status: " + self.parse_status + "\n\n\n"
+        print(mystr)
+        try:
+            self.book_image.show()
+        except:
+            print("No cover image available.")
 
 '''
 get_book_site(slug)
+# type: (str) -> BookSite
+"""Given a booksite slug, return a BookSite object corresponding to the slug"""
+
+book_site.get_book_data_from_site(url)
 # type: (str) -> SiteBookData
 """Given a direct link to a book page at a site, parse it and return the SiteBookData of the info"""
 

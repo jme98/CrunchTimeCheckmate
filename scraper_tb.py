@@ -1,8 +1,9 @@
 import requests, io
 from lxml import etree
 from objects import *
+from book_site import BookSite
+from PIL import Image
 from datetime import datetime
-
 __MAIN_URL_TB__ = "http://127.0.0.1:8000/TestBookStore/book_detail/"
 
 def fetch_tb(book_id):
@@ -201,3 +202,18 @@ if __name__ == "__main__":
     print(content)
     root = parse_tb(content)
     #CALL AND DEBUG EACH METHOD INDIVIDUALLY, STARTING WITH get_description()
+
+class TestBook(BookSite):
+    def __init__(self):
+        self.slug = 'tb'
+        self.base = 'http://127.0.0.1:8000/'
+        self.stripped = '127.0.0.1:8000'
+        self.search = 'search/'
+
+    def _construct_params_of_search(self, book_data):
+        return {"q":str(book_data)}
+
+    def _find_results_of_search(self, root):
+        results = root.xpath("//a[@class='noColor']/@href")
+        for result in results:
+            result = results[1:]

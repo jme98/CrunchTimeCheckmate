@@ -28,6 +28,7 @@ class BookSite:
         data.description = self._find_description(root)
         data.title = self._find_title(root)
         data.subtitle = self._find_subtitle(root)
+        data.series = self._find_series(root)
         data.authors = self._find_authors(root)
         
         data.ready_for_sale = self._find_ready_for_sale(root)
@@ -103,7 +104,10 @@ class BookSite:
 
     #region parse subfunctions
     def _find_parse_status(self, data):
-        return "UNSUCCESSFUL"
+        if data.book_format != "" and data.isbn_13 != "" and data.description != "" and data.title != "" and data.authors != []:
+            return "FULLY_PARSED"
+        else:
+            return "UNSUCCESSFUL"
 
     def _find_book_format(self, root):
         return "NO_FORMAT"
@@ -124,6 +128,9 @@ class BookSite:
         return ""
 
     def _find_subtitle(self, root):
+        return ""
+
+    def _find_series(self, root):
         return ""
 
     def _find_authors(self, root):

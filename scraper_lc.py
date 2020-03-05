@@ -17,12 +17,6 @@ class LivrariaCultura(BookSite):
         return root.xpath("//div[@class='prateleiraProduto__informacao']/h2/a/@href")
 
     #region parse subfunctions
-    def _find_parse_status(self, data):
-        if data.book_format != "" and data.isbn_13 != "" and data.description != "" and data.title != "" and data.authors != []:
-            return "FULLY_PARSED"
-        else:
-            return "UNSUCCESSFUL"
-
     def _find_book_format(self, root):
         try:
             book_format = root.xpath("//td[@class='value-field Formato']")[0].text

@@ -61,12 +61,6 @@ class Scribd(BookSite):
 
 
     #region parse subfunctions
-    def _find_parse_status(self, data):
-        if data.book_format != "" and data.isbn_13 != "" and data.description != "" and data.title != "" and data.authors != []:
-            return "FULLY_PARSED"
-        else:
-            return "UNSUCCESSFUL"
-
     def _find_book_format(self, root):
         try:
             book_format = root.xpath("//meta[@property='og:type']/@content")[0]

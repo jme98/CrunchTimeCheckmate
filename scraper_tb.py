@@ -21,12 +21,12 @@ class TestBook(BookSite):
     #region parse subfunctions
     def _find_book_format(self, root):
         try:
-            book_format = root.xpath("//td[@class='value-field Formato']")[0].text
+            book_format = root.xpath("//strong[text()='Format:']")[0].tail[1:]
             if book_format != None:
-                if book_format == 'LIVRO':
-                    return 'PRINT'
-                elif book_format == 'ePub':
+                if book_format == 'E101':
                     return 'DIGITAL'
+                elif book_format == 'ePub':
+                    return 'PRINT'
                 else:
                     return 'AUDIOBOOK'
             else:
@@ -36,9 +36,9 @@ class TestBook(BookSite):
 
     def _find_isbn_13(self, root):
         try:
-            isbn_13 = root.xpath("//div[@class='col-sm-10 ']/p")[4].text[1:]
-            if isbn_13 != None:
-                return isbn_13
+            title = root.xpath("//strong[text()='ISBN 13:']")[0].tail[1:]
+            if title != None:
+                return title
             else:
                 return ""
         except:
@@ -46,7 +46,7 @@ class TestBook(BookSite):
 
     def _find_description(self, root):
         try:
-            description = root.xpath("//td[@class='value-field Sinopse']")[0].text
+            description = str(root.xpath("//strong[text()='Book Description:']/parent::p/following-sibling::p/p")[0])
             if description != None:
                 return description
             else:
@@ -66,7 +66,7 @@ class TestBook(BookSite):
 
     def _find_subtitle(self, root):
         try:
-            subtitle = root.xpath("//span[@class='subtitle']")[0].text
+            subtitle = root.xpath("//strong[text()='Subtitle:']")[0].tail[1:]
             if subtitle != None:
                 return subtitle
             else:
@@ -74,17 +74,19 @@ class TestBook(BookSite):
         except:
             return ""
 
+    def _find_series(self, root):
+        try:
+            series = root.xpath("//strong[text()='Series Name:']")[0].tail[1:]
+            if series != None:
+                return series
+            else:
+                return ""
+        except:
+            return ""
+
     def _find_authors(self, root):
-        authors = root.xpath("//td[@class='value-field Colaborador']/text()")
-        revised = []
-        for a in authors:
-            try:
-                index = a.index(':')
-            except:
-                index = 0
-            revised.append(a[index+1:])
-        return revised
+        return root.xpath("//ul/p/text()")
 
     def _find_ready_for_sale(self, root):
-        return root.xpath("//button[@class='buy-in-page-button']") != []
+        return False
     #endregion

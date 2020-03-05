@@ -41,6 +41,9 @@ class GoogleBooks:
     def convert_book_id_to_url(self, book_id):
         return self.base + book_id
 
+    def construct_params_of_search(book_data):
+
+
 def _find_book_format(root):
     try:
         p = root.xpath(".//a[@id='gb-get-book-content']")[0].text

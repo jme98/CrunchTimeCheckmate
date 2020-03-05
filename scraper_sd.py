@@ -1,129 +1,151 @@
 import requests
 from lxml import etree
 from objects import *
+from book_site import BookSite
 from PIL import Image
-class Scribd:
-    #region fields
-    slug = 'sd'
-    base = 'https://www.scribd.com/'
-    stripped = 'www.scribd.com' #url base, but stripped of surrounding 'https://' and '/'
-    #endregion
+class Scribd(BookSite):
+    def __init__(self):
+        self.slug = 'sd'
+        self.base = 'https://www.scribd.com/'
+        self.stripped = 'www.scribd.com'
+        self.search = 'search'
 
-    def get_book_data_from_site(self, url):
-        response = requests.get(url)
-        root = etree.fromstring(response.content, etree.HTMLParser())
-        data = SiteBookData()
-
-        data.book_format = _find_book_format(root)
-        data.book_image_url = _find_book_image_url(root)
-        data.book_image = _find_book_image(data.book_image_url)
-        data.isbn_13 = _find_isbn_13(root)
-        data.description = _find_description(root)
-        data.title = _find_title(root)
-        data.subtitle = _find_subtitle(root)
-        data.authors = _find_authors(root)
-
-        data.ready_for_sale = _find_ready_for_sale(root)
-        data.book_id = url.strip('https://').strip(self.stripped).strip('/')
-        data.site_slug = self.slug
-        data.url = url
-        data.content = response.content
-        data.parse_status = _find_parse_status(data)
-
-        return data
-
+    #overriding super function because isbn-13 and title/author cannot be searched together on scribd
     def find_book_matches_at_site(self, book_data):
-        pass
+        mystr = book_data.title
+        for a in book_data.authors:
+            mystr += " " + a
+        mystr.strip(".,' ")
 
-    def convert_book_id_to_url(self, book_id):
-        return self.base + book_id
+        responses = []
+        responses.append(requests.get(self.base + self.search, params=self._construct_params_of_search(mystr)))
+        responses.append(requests.get(self.base + self.search, params=self._construct_params_of_search(book_data.isbn_13)))
+        roots = []
+        roots.append(etree.fromstring(responses[0].content, etree.HTMLParser()))
+        roots.append(etree.fromstring(responses[1].content, etree.HTMLParser()))
+        links = self._find_results_of_search(roots[0])
+        links += self._find_results_of_search(roots[1])
+        links = list(dict.fromkeys(links))
 
-#region parse subfunctions
-def _find_parse_status(data):
-    if data.book_format != "" and data.isbn_13 != "" and data.description != "" and data.title != "" and data.authors != []:
-        return "FULLY_PARSED"
-    else:
-        return "UNSUCCESSFUL"
+        results = []
+        graded_results = []
+        for l in links:
+            results.append(self.get_book_data_from_site(l))
+        for result in results:
+            graded_results.append((result.title, self.evaluate_potential_match(book_data, result)))
 
-def _find_book_format(root):
-    try:
-        book_format = root.xpath("//meta[@property='og:type']/@content")[0]
-        if book_format != None:
-            if book_format == 'book':
-                return 'DIGITAL'
+        empty = True
+        while (empty):
+            try:
+                graded_results.remove(('', 0))
+            except:
+                empty = False
+
+        return graded_results
+
+    def _construct_params_of_search(self, book_data):
+        return {"query":str(book_data)}
+
+    def _find_results_of_search(self, root):
+        urls = []
+        script = root.xpath("//script[@src='https://apis.google.com/js/platform.js?onload=googleOnLoad']/following-sibling::script")[0].text
+        pre = script.find('book_preview_url')
+        while (pre != -1):
+            first = script.find('https://www.scribd.com/', pre)
+            post = script.find('}', first)
+            url = script[first:post-1]
+            if (url != ""):
+                urls.append(url)
+            pre = script.find('book_preview_url', post)
+        return urls
+
+
+    #region parse subfunctions
+    def _find_parse_status(self, data):
+        if data.book_format != "" and data.isbn_13 != "" and data.description != "" and data.title != "" and data.authors != []:
+            return "FULLY_PARSED"
+        else:
+            return "UNSUCCESSFUL"
+
+    def _find_book_format(self, root):
+        try:
+            book_format = root.xpath("//meta[@property='og:type']/@content")[0]
+            if book_format != None:
+                if book_format == 'book':
+                    return 'DIGITAL'
+                else:
+                    return 'AUDIOBOOK'
             else:
-                return 'AUDIOBOOK'
-        else:
+                return ""
+        except:
             return ""
-    except:
-        return ""
-    
-def _find_book_image_url(root):
-    try:
-        book_image_url = root.xpath("//meta[@property='og:image']/@content")[0]
-        if book_image_url != None:
-            return book_image_url
-        else:
+        
+    def _find_book_image_url(self, root):
+        try:
+            book_image_url = root.xpath("//meta[@property='og:image']/@content")[0]
+            if book_image_url != None:
+                return book_image_url
+            else:
+                return ""
+        except:
             return ""
-    except:
-        return ""
 
-def _find_book_image(url):
-    try:
-        rspns = requests.get(url, stream=True)
-        rspns.raw.decode_content = True
-        book_image = Image.open(rspns.raw)
-        return book_image
-    except:
-        return None
+    def _find_book_image(self, url):
+        try:
+            rspns = requests.get(url, stream=True)
+            rspns.raw.decode_content = True
+            book_image = Image.open(rspns.raw)
+            return book_image
+        except:
+            return None
 
-def _find_isbn_13(root):
-    try:
-        isbn_13 = root.xpath("//meta[@property='books:isbn']/@content")[0]
-        if isbn_13 != None:
-            return isbn_13
-        else:
+    def _find_isbn_13(self, root):
+        try:
+            isbn_13 = root.xpath("//meta[@property='books:isbn']/@content")[0]
+            if isbn_13 != None:
+                return isbn_13
+            else:
+                return ""
+        except:
             return ""
-    except:
-        return ""
 
-def _find_description(root):
-    try:
-        description = root.xpath("//meta[@name='twitter:description']/@content")[0]
-        if description != None:
-            return description
-        else:
+    def _find_description(self, root):
+        try:
+            description = root.xpath("//meta[@name='twitter:description']/@content")[0]
+            if description != None:
+                return description
+            else:
+                return ""
+        except:
             return ""
-    except:
-        return ""
 
-def _find_title(root):
-    try:
-        title = root.xpath("//meta[@property='og:title']/@content")[0]
-        if title != None:
-            return title
-        else:
+    def _find_title(self, root):
+        try:
+            title = root.xpath("//meta[@property='og:title']/@content")[1]
+            if title != None:
+                return title
+            else:
+                return ""
+        except:
             return ""
-    except:
-        return ""
 
-def _find_subtitle(root):
-    try:
-        subtitle = root.xpath("//span[@class='subtitle']")[0].text
-        if subtitle != None:
-            return subtitle
-        else:
+    def _find_subtitle(self, root):
+        try:
+            subtitle = root.xpath("//span[@class='subtitle']")[0].text
+            if subtitle != None:
+                return subtitle
+            else:
+                return ""
+        except:
             return ""
-    except:
-        return ""
 
-def _find_authors(root):
-    authors = root.xpath("//span[@class='author']/descendant::*/text()")
-    if len(authors) > 1:
-        return authors[1:]
-    else:
-        return []
+    def _find_authors(self, root):
+        authors = root.xpath("//span[@class='author']/descendant::*/text()")
+        if len(authors) > 1:
+            return authors[1:]
+        else:
+            return []
 
-def _find_ready_for_sale(root):
-    return None
-#endregion
+    def _find_ready_for_sale(self, root):
+        return True
+    #endregion

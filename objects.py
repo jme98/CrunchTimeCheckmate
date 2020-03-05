@@ -34,8 +34,6 @@ class SiteBookData:
         mystr += " " + self.isbn_13
         for a in self.authors:
             mystr += " " + a
-        mystr += " " + self.series
-        mystr += " " + self.subtitle
         return mystr.strip(".,' ")
 
     def pr(self):

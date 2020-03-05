@@ -143,7 +143,7 @@ def get_volume_no(etree_root):
     else:
         return volume_no
     """
-    return "" #temp fix so that no_undefined won't trip over this function being non-functional
+    pass
 
 def get_price(etree_root):
     xpath = "//p/strong[normalize-space(text()) = 'Price:']/following-sibling::text()"

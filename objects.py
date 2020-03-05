@@ -77,4 +77,8 @@ book_site.find_book_matches_at_site(book_data)
 book_site.convert_book_id_to_url(book_id)
 # type: (str) -> str
 """Given a book_id, return the direct URL for the book."""
+<<<<<<< HEAD
+
+=======
+>>>>>>> master
 '''

@@ -16,7 +16,6 @@ class BookSite:
         self.search = 'find/'
 
     def get_book_data_from_site(self, url):
-        print(url)
         response = requests.get(url)
         root = etree.fromstring(response.content, etree.HTMLParser())
         data = SiteBookData()

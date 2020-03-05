@@ -1,10 +1,11 @@
-# object definitions (SiteBookData object et al.) go in this file
-# BookSites:
-#   tb = test bookstore
-#   kb = Kobo
-#   gb = Google Books
-#   lc = LivrariaCultura
-#   sd = Scribd
+"""
+BookSites are referenced as follows:
+   tb = TestBookStore
+   kb = Kobo
+   gb = Google Books
+   lc = LivrariaCultura
+   sd = Scribd
+"""
 
 import string
 
@@ -20,9 +21,9 @@ class SiteBookData:
     authors = [] # all authors for the work
     book_id = "" # page identifier (used to reconstruct direct page URL), MAY NOT BE ISBN!
     site_slug = "" # slug for the BookSite
-    parse_status = "" # FULLY_PARSED, or UNSUCCESSFUL
+    parse_status = "" # FULLY_PARSED or UNSUCCESSFUL
     url = "" # final, direct URL to the book page
-    content = "" #html content of the parsed page
+    page_content = "" #html content of the parsed page
     ready_for_sale = False # boolean; is this book currently purchasable at this site?
     extra = {} # dictionary of any other relevant data provided by the BookSite
 
@@ -75,8 +76,4 @@ book_site.find_book_matches_at_site(book_data)
 book_site.convert_book_id_to_url(book_id)
 # type: (str) -> str
 """Given a book_id, return the direct URL for the book."""
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 '''

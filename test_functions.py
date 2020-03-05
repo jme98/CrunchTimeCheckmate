@@ -30,7 +30,12 @@ slug = 'gb'
 site = get_book_site(slug)
 url = site.convert_book_id_to_url(gb)
 sbd = site.get_book_data_from_site(url)
+<<<<<<< HEAD
+print(sbd.description)
+#print(site.find_book_matches_at_site(sbd))
+=======
 #sbd.pr()
 print(get_book_site(slug).find_book_matches_at_site(sbd))
+>>>>>>> master
 
 #open("sdsample2.txt", "wb").write(site.find_book_matches_at_site(sbd))

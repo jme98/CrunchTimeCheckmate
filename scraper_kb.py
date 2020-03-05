@@ -16,7 +16,6 @@ def get_image(image_url):
     return Image.open(rspns.raw)
 
 #terms is assumed to contain a string of search terms separated by whitespace characters
-#tested: gets the proper page
 def search(search_terms):
     url = 'https://www.kobo.com/us/en/'
     for x in search_terms:
@@ -36,7 +35,6 @@ def evaluate_search_results(search_urls, searched_book_data):
     parsed_book_data = []
     search_evaluations = []
     i = 0
-    #make sure x is content
     for x in search_urls:
         response = requests.get(x)
         parsed_book_data.append(parse(response.content, x.strip('https://www.kobo.com/us/en/')))

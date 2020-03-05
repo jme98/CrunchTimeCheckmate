@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set "VIRTUAL_ENV=C:\Users\rtd7\Documents\CT2\env"
+set "VIRTUAL_ENV=C:\Users\david\Desktop\S20\SE5\Project\Repos\Checkmate\env"
 
 if not defined PROMPT (
     set "PROMPT=$P$G"

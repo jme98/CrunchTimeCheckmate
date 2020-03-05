@@ -1,4 +1,3 @@
 {
-    //"python.pythonPath": "C:\\Users\\rtd7\\AppData\\Local\\Programs\\Python\\Python37\\python.exe"
-    "python.pythonPath": "c:\\Users\\rtd7\\Documents\\CT2\\env\\Scripts\\python.exe"
+    "python.pythonPath": "env\\Scripts\\python.exe"
 }

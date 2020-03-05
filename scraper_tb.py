@@ -134,6 +134,7 @@ def get_description(etree_root):
     pass #TODO: xpath won't get the last <p> tag in the page correctly, so use string searching to find it
 
 def get_volume_no(etree_root):
+    """
     xpath = "//p/strong[normalize-space(text()) = 'Volume Number:']/following-sibling::text()"
     volume_no = etree_root.xpath(xpath)[0]
     volume_no = volume_no[1:] #remove leading whitespace
@@ -141,6 +142,8 @@ def get_volume_no(etree_root):
         return ""
     else:
         return volume_no
+    """
+    return "" #temp fix so that no_undefined won't trip over this function being non-functional
 
 def get_price(etree_root):
     xpath = "//p/strong[normalize-space(text()) = 'Price:']/following-sibling::text()"

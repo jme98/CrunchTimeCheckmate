@@ -56,7 +56,11 @@ class TestBook(BookSite):
 
     def _find_description(self, root):
         try:
-            description = str(root.xpath("//p[@class='b:description']")[0])
+            descr = root.xpath("//div[@class='b:description']/descendant::*/text()")
+            description = ''
+            for paragraph in descr:
+                description += paragraph
+
             if description != None:
                 return description
             else:

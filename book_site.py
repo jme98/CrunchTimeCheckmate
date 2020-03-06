@@ -40,9 +40,10 @@ class BookSite:
         
         return data
 
+#results for google books are weird - pages with previews do not contain isbns
+#it still seems to come up with the right results though
     def find_book_matches_at_site(self, book_data):
         response = requests.get(self.base + self.search, params=self._construct_params_of_search(book_data))
-        open("rando.txt", "wb").write(response.content)
         root = etree.fromstring(response.content, etree.HTMLParser())
         links = self._find_results_of_search(root)
         results = []
@@ -153,6 +154,6 @@ class BookSite:
             final_isbn.append(calc_check_digit(final_isbn))
             return final_isbn
         else:
-            return None
+            return ""
 
     #endregion

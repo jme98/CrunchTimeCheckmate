@@ -50,7 +50,7 @@ class LivrariaCultura(BookSite):
         except:
             return None
 
-    def _find_isbn_13(self, root):
+    def _find_isbn(self, root):
         try:
             isbn_13 = root.xpath("//td[@class='value-field ISBN']")[0].text
             if isbn_13 != None:

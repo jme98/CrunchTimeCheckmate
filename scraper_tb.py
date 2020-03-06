@@ -10,15 +10,21 @@ class TestBook(BookSite):
         self.slug = 'tb'
         self.base = 'http://127.0.0.1:8000/'
         self.stripped = '127.0.0.1:8000'
-        self.search = 'search/'
+        self.search = 'TestBookStore/search/'
 
     def _construct_params_of_search(self, book_data):
         return {"q":str(book_data)}
 
     def _find_results_of_search(self, root):
         results = root.xpath("//a[@class='noColor']/@href")
-        for result in results:
-            result = results[1:]
+        try:
+            results = results[1:]
+            full_results = []
+            for result in results:
+                full_results.append(self.base + result[1:])
+            return full_results
+        except:
+            return results
 
     #region parse subfunctions
     def _find_book_format(self, root):
@@ -38,7 +44,7 @@ class TestBook(BookSite):
         except:
             return ""
 
-    def _find_isbn_13(self, root):
+    def _find_isbn(self, root):
         try:
             isbn = root.xpath("//strong[text()='ISBN 13:']")[0].tail[1:]
             if isbn != None:
@@ -50,7 +56,11 @@ class TestBook(BookSite):
 
     def _find_description(self, root):
         try:
-            description = str(root.xpath("//p[@class='b:description']")[0])
+            descr = root.xpath("//div[@class='b:description']/descendant::*/text()")
+            description = ''
+            for paragraph in descr:
+                description += paragraph
+
             if description != None:
                 return description
             else:
@@ -112,17 +122,23 @@ class TestBook(BookSite):
 
     def _find_price(self, etree_root):
         xpath = "//p/strong[normalize-space(text()) = 'Price:']/following-sibling::text()"
-        price = etree_root.xpath(xpath)[0]
-        price = price[1:] #remove leading whitespace
-        final_string = "$"
-        final_string = final_string + price
-        return final_string
+        try:
+            price = etree_root.xpath(xpath)[0]
+            price = price[1:] #remove leading whitespace
+            final_string = "$"
+            final_string = final_string + price
+            return final_string
+        except:
+            return ""
 
     def _find_release_date(self, etree_root):
         xpath = "//p/strong[normalize-space(text()) = 'Release Date:']/following-sibling::text()"
-        date_string = etree_root.xpath(xpath)[0]
-        release_date = self._parse_date_string(date_string)
-        return release_date
+        try:
+            date_string = etree_root.xpath(xpath)[0]
+            release_date = self._parse_date_string(date_string)
+            return release_date
+        except:
+            return ""
 
     def _find_extras(self, root):
         extras = {}

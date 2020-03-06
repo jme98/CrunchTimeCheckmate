@@ -55,7 +55,7 @@ class GoogleBooks(BookSite):
         except:
             return None
 
-    def _find_isbn_13(self, root):
+    def _find_isbn(self, root):
         try:
             stuff = root.xpath(".//span[@dir='ltr']")
             count = 0

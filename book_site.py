@@ -23,7 +23,7 @@ class BookSite:
         data.book_format = self._find_book_format(root)
         data.book_image_url = self._find_book_image_url(root)
         data.book_image = self._find_book_image(data.book_image_url)
-        data.isbn_13 = self._find_isbn_13(root)
+        data.isbn_13 = self._format_isbn(self._find_isbn(root))
         data.description = self._find_description(root)
         data.title = self._find_title(root)
         data.subtitle = self._find_subtitle(root)
@@ -42,6 +42,7 @@ class BookSite:
 
     def find_book_matches_at_site(self, book_data):
         response = requests.get(self.base + self.search, params=self._construct_params_of_search(book_data))
+        open("rando.txt", "wb").write(response.content)
         root = etree.fromstring(response.content, etree.HTMLParser())
         links = self._find_results_of_search(root)
         results = []
@@ -118,7 +119,7 @@ class BookSite:
     def _find_book_image(self, url):
         return None
 
-    def _find_isbn_13(self, root):
+    def _find_isbn(self, root):
         return ""
 
     def _find_description(self, root):
@@ -141,4 +142,17 @@ class BookSite:
     
     def _find_extras(self, root):
         return {}
+
+    def _format_isbn(self, isbn):
+        if len(isbn) == 13:
+            return isbn
+        elif len(isbn) == 10:
+            nine_digits = isbn[0:9] #slice off the old check digit
+            final_isbn = "978"
+            final_isbn.append(nine_digits)
+            final_isbn.append(calc_check_digit(final_isbn))
+            return final_isbn
+        else:
+            return None
+
     #endregion

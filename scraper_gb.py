@@ -16,7 +16,6 @@ class GoogleBooks(BookSite):
             "q":str(book_data)
         }
 
-#DON"T FORGET
     def _find_results_of_search(self, root):
         p = root.xpath(".//div[@class='ZINbbc xpd O9g5cc uUPGi']/div[@class='x54gtf']/following-sibling::div/a/@href")
         return p
@@ -71,8 +70,10 @@ class GoogleBooks(BookSite):
                     ready = 1
                 elif ready == 1:
                     isbn_str = isbn_str + i
-
-            return isbn_str
+            if isbn_start == 0 or isbn_str is None:
+                return ""
+            else:
+                return isbn_str
         except:
             return ""
 

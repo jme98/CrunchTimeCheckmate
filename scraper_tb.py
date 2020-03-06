@@ -56,7 +56,7 @@ class TestBook(BookSite):
 
     def _find_description(self, root):
         try:
-            description = str(root.xpath("//strong[text()='Book Description:']/parent::p/following-sibling::p/p")[0])
+            description = str(root.xpath("//p[@class='b:description']")[0])
             if description != None:
                 return description
             else:

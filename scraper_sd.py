@@ -92,7 +92,7 @@ class Scribd(BookSite):
         except:
             return None
 
-    def _find_isbn_13(self, root):
+    def _find_isbn(self, root):
         try:
             isbn_13 = root.xpath("//meta[@property='books:isbn']/@content")[0]
             if isbn_13 != None:

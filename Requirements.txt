@@ -7,6 +7,6 @@ in the parentheses after the library name when you have done so.
 e.g. "django (Jennifer, Jessica, David) REMOVED BY DAVID"
 
 LIBRARIES:
--- lxml (Jennifer, David, Brandon)
--- requests (David, Brandon)
--- Pillow (David, Brandondata.)
+-- lxml (Jennifer, David, Brandon, Jessica)
+-- requests (David, Brandon, Jessica)
+-- Pillow (David, Brandon, Jessica)

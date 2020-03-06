@@ -8,5 +8,5 @@ e.g. "django (Jennifer, Jessica, David) REMOVED BY DAVID"
 
 LIBRARIES:
 -- lxml (Jennifer, David, Brandon)
--- requests (David, Brandon)
--- Pillow (David, Brandondata.)
+-- requests (David, Brandon, Jennifer)
+-- Pillow (David, Brandon, Jennifer)

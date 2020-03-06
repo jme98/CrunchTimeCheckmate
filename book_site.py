@@ -36,6 +36,7 @@ class BookSite:
         data.url = url
         data.content = response.content
         data.parse_status = self._find_parse_status(data)
+        data.extras = self._find_extras(root)
         
         return data
 
@@ -137,4 +138,7 @@ class BookSite:
 
     def _find_ready_for_sale(self, root):
         return False
+    
+    def _find_extras(self, root):
+        return {}
     #endregion

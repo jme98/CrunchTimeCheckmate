@@ -27,8 +27,10 @@ class SiteBookData:
     ready_for_sale = False # boolean; is this book currently purchasable at this site?
     extra = {} # dictionary of any other relevant data provided by the BookSite
 
-    def __init__(self):
-        pass
+    def __init__(self, isbn_13="", title="", authors=[]):
+        self.isbn_13 = isbn_13
+        self.title = title
+        self.authors = authors
 
     def __str__(self):
         mystr = self.title
@@ -58,22 +60,3 @@ class SiteBookData:
             self.book_image.show()
         except:
             print("No cover image available.")
-
-'''
-get_book_site(slug)
-# type: (str) -> BookSite
-"""Given a booksite slug, return a BookSite object corresponding to the slug"""
-
-book_site.get_book_data_from_site(url)
-# type: (str) -> SiteBookData
-"""Given a direct link to a book page at a site, parse it and return the SiteBookData of the info"""
-
-book_site.find_book_matches_at_site(book_data)
-# type: (SiteBookData) -> List[Tuple[SiteBookData, float]]
-"""Given a SiteBookData, search for the book at the ‘book_site’ site and provide a list of likely matches paired with how good of a match it is (1.0 is an exact match).
-   This should take into account all the info we have about a book, including the cover."""
-
-book_site.convert_book_id_to_url(book_id)
-# type: (str) -> str
-"""Given a book_id, return the direct URL for the book."""
-'''

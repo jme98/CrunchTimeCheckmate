@@ -110,5 +110,9 @@ class Kobo(BookSite):
         return root.xpath('.//span[@class="authors product-field contributor-list"]/span[@class="visible-contributors"]/descendant::*/text()')
 
     def _find_ready_for_sale(self, root):
-        return True
+        try:
+            purchasable = root.xpath('.//button[@class="purchase-action buy-now"]/span')
+            return purchasable != []
+        except:
+            return ""
     #endregion

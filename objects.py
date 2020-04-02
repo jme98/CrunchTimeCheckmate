@@ -5,6 +5,7 @@ BookSites are referenced as follows:
    gb = Google Books
    lc = LivrariaCultura
    sd = Scribd
+   ab = Audiobooks.com
 """
 
 import string

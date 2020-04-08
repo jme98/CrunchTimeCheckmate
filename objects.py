@@ -25,7 +25,7 @@ class SiteBookData:
     url = "" # final, direct URL to the book page
     page_content = "" #html content of the parsed page
     ready_for_sale = False # boolean; is this book currently purchasable at this site?
-    extra = {} # dictionary of any other relevant data provided by the BookSite
+    extras = {} # dictionary of any other relevant data provided by the BookSite
 
     def __init__(self, isbn_13="", title="", authors=[]):
         self.isbn_13 = isbn_13
@@ -54,7 +54,11 @@ class SiteBookData:
         mystr += "Site Slug: " + self.site_slug + "\n"
         mystr += "URL: " + self.url + "\n"
         mystr += "RFS: " + str(self.ready_for_sale) + "\n"
-        mystr += "Parse Status: " + self.parse_status + "\n\n\n"
+        mystr += "Parse Status: " + self.parse_status + "\n"
+        mystr += "Extras:\n"
+        for extra, value in self.extras.items():
+            mystr += "    " + extra + ": " + str(value) + "\n"
+        mystr += "\n\n"
         print(mystr)
         try:
             self.book_image.show()

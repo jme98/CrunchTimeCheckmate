@@ -112,7 +112,8 @@ class TestBook(BookSite):
         return authors
 
     def _find_ready_for_sale(self, root):
-        return False
+        release = self._find_release_date(root)
+        return release != "" and release < datetime.now()
 
     def _parse_date_string(self, date_string):
         truncate_index = date_string.rfind(",") #locate the comma that comes after the year

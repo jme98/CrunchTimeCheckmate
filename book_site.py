@@ -51,7 +51,7 @@ class BookSite:
         for l in links:
             results.append(self.get_book_data_from_site(l))
         for result in results:
-            graded_results.append((result, self.evaluate_potential_match(book_data, result), self._evaluate_descriptions(book_data.description, result.description)))
+            graded_results.append((result, self.evaluate_potential_match(book_data, result)))
 
         return graded_results
 
@@ -82,6 +82,7 @@ class BookSite:
             if baseline.series == match.series:
                 value += 1/prop
         if baseline.description != "":
+            print("xxxxx: " + baseline.description)
             prop *= 2
             value += (1/prop) * self._evaluate_descriptions(baseline.description, match.description)
         if baseline.book_image != None:
@@ -93,56 +94,65 @@ class BookSite:
         return value
 
     def _evaluate_author_names(self, baseline, match):
-        total = 0
-        for author in baseline:
-            current_best = 0
-            for author2 in match:
-                result = self._compare_author_names(author.lower(), author2.lower())
-                if result > current_best:
-                    current_best = result
-            total += current_best
-        if len(baseline) > len(match):
-            return total / len(baseline)
-        else:
-            return total / len(match)
+        try:
+            total = 0
+            for author in baseline:
+                current_best = 0
+                for author2 in match:
+                    result = self._compare_author_names(author.lower(), author2.lower())
+                    if result > current_best:
+                        current_best = result
+                total += current_best
+            if len(baseline) > len(match):
+                return total / len(baseline)
+            else:
+                return total / len(match)
+        except:
+            return 0
 
     def _compare_author_names(self, baseline, match):
-        author = baseline.split()
-        author2 = match.split()
-        for word in author:
-            word.strip(",.'")
-        for word in author2:
-            word.strip(",.'")
-        total = 0
-        for word in author:
-            current_best = 0
-            for word2 in author2:
-                if word == word2:
-                    current_best = 1
-            total += current_best
-        if (len(author) > len(author2)):
-            return total / len(author)
-        else:
-            return total / len(match)
+        try:
+            author = baseline.split()
+            author2 = match.split()
+            for word in author:
+                word.strip(",.'")
+            for word in author2:
+                word.strip(",.'")
+            total = 0
+            for word in author:
+                current_best = 0
+                for word2 in author2:
+                    if word == word2:
+                        current_best = 1
+                total += current_best
+            if (len(author) > len(author2)):
+                return total / len(author)
+            else:
+                return total / len(match)
+        except:
+            return 0
 
     def _evaluate_descriptions(self, baseline, match):
-        value = 0
-        b = baseline.split()
-        m = match.split()
-        size = len(b)
-        if len(b) < len(m):
-            size = len(m)
-        for index in range(0, len(b)):
-            word = b[index]
-            if word in m:
-                matches = [i for i, x in enumerate(m) if x == word]
-                proximity = 0
-                for same in matches:
-                    prox = (size - abs(index - same))
-                    if prox > proximity:
-                        proximity = prox
-                value += proximity / size
-        return value / size
+        try:
+            value = 0
+            b = baseline.split()
+            m = match.split()
+            size = len(b)
+            if len(b) < len(m):
+                size = len(m)
+            for index in range(0, len(b)):
+                word = b[index]
+                if word in m:
+                    matches = [i for i, x in enumerate(m) if x == word]
+                    proximity = 0
+                    for same in matches:
+                        prox = (size - abs(index - same))
+                        if prox > proximity:
+                            proximity = prox
+                    value += proximity / size
+            return value / size
+        except:
+            return 0
 
     def convert_book_id_to_url(self, book_id):
         return self.base + book_id

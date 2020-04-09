@@ -30,7 +30,7 @@ class Kobo(BookSite):
         for l in links:
             results.append(self.get_book_data_from_site(l))
         for result in results:
-            graded_results.append((result.title, self.evaluate_potential_match(book_data, result), self._evaluate_descriptions(book_data.description, result.description)))
+            graded_results.append((result.title, self.evaluate_potential_match(book_data, result)))
 
         empty = True
         while (empty):

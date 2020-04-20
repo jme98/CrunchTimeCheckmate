@@ -8,9 +8,9 @@ gb = 'books?id=30ZuZjVP7V0C'
 tb = 'TestBookStore/book_detail/781524243456/'
 
 
-slug = 'lc'
+slug = 'gb'
 site = get_book_site(slug)
-url = site.convert_book_id_to_url(lc)
+url = site.convert_book_id_to_url(gb)
 sbd = site.get_book_data_from_site(url)
 print("TEST 1:")
 print(site.slug)

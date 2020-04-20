@@ -27,8 +27,17 @@ class SiteBookData:
     ready_for_sale = False # boolean; is this book currently purchasable at this site?
     extra = {} # dictionary of any other relevant data provided by the BookSite
 
-    def __init__(self):
-        pass
+    def __init__(self, isbn = '', title = '', authors = []):
+        if len(isbn) == 10:
+            nine_digits = isbn[0:9] #slice off the old check digit
+            final_isbn = "978"
+            final_isbn += nine_digits
+            final_isbn += self._calc_check_digit(final_isbn)
+            self.isbn_13 = final_isbn
+        else:
+            self.isbn_13 = isbn
+        self.title = title
+        self.authors = authors
 
     def __str__(self):
         mystr = self.title
@@ -58,6 +67,27 @@ class SiteBookData:
             self.book_image.show()
         except:
             print("No cover image available.")
+
+    def _calc_check_digit(self, isbn_string):
+        products = []
+        for i in range(0, 12):
+            if ((i + 1) % 2) != 0: #we are looking at the first, third, fifth ... digit
+                products[i] = isbn_string[i] * 1
+            else: #we are looking at the second, fourth, sixth ... digit
+                products[i] = isbn_string[i] * 3
+
+        accumulator = 0
+        for p in products:
+            accumulator += p
+
+        modulated = accumulator % 10
+
+        if modulated == 0:
+            check_digit = modulated
+        else:
+            check_digit = 10 - modulated
+
+        return check_digit
 
 '''
 get_book_site(slug)

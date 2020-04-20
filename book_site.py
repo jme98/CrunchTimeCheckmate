@@ -82,7 +82,6 @@ class BookSite:
             if baseline.series == match.series:
                 value += 1/prop
         if baseline.description != "":
-            print("xxxxx: " + baseline.description)
             prop *= 2
             value += (1/prop) * self._evaluate_descriptions(baseline.description, match.description)
         if baseline.book_image != None:

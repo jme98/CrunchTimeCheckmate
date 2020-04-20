@@ -17,11 +17,7 @@ print(site.slug)
 print("TEST 2:")
 sbd.pr()
 print("TEST 3:")
-<<<<<<< HEAD
-# sbd = SiteBookData(isbn_13="", title="", authors=["percy b"])
-=======
 #sbd = SiteBookData(isbn_13="", title="", authors=[])
->>>>>>> master
 print(site.find_book_matches_at_site(sbd))
 print("TEST 4:")
 print(url)

@@ -65,3 +65,27 @@ class SiteBookData:
             self.book_image.show()
         except:
             print("No cover image available.")
+
+    def to_json(self):
+        mystr = "{"
+        mystr += f"'book_format' : '{self.book_format}', "
+        mystr += f"'book_image_url' : '{self.book_image_url}', "
+        mystr += f"'isbn_13' : '{self.isbn_13}', "
+        mystr += f"'description' : '{self.description}', "
+        mystr += f"'series' : '{self.series}', "
+        mystr += f"'title' : '{self.title}', "
+        mystr += f"'subtitle' : '{self.subtitle}', "
+        mystr += "'authors' : ["
+        for a in self.authors:
+            mystr += f"'{a}', "
+        mystr += "],"
+        mystr += f"'book_id' : '{self.book_id}', "
+        mystr += f"'site_slug' : '" + self.site_slug + "', "
+        mystr += f"'url' : '{self.url}',"
+        mystr += f"'ready_for_sale' : '{str(self.ready_for_sale)}', "
+        mystr += f"'parse_status' : '{self.parse_status}', "
+        mystr += "'extras' : {"
+        for extra, value in self.extras.items():
+            mystr += f"'{extra}' : '{str(value)}', "
+        mystr += "}"
+        mystr += "}"

@@ -124,7 +124,7 @@ class BookSite:
             if (len(author) > len(author2)):
                 return total / len(author)
             else:
-                return total / len(match)
+                return total / len(author2)
         except:
             return 0
 

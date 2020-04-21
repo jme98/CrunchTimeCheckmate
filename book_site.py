@@ -64,8 +64,7 @@ class BookSite:
                 value += 1/prop
         if baseline.title != "":
             prop *= 2
-            if baseline.title == match.title:
-                value += 1/prop
+            value += (1/prop) *self._evaluate_string_fields(baseline.title.lower(), match.title.lower())
         if baseline.authors != []:
             prop *= 2
             value += (1/prop) * self._evaluate_author_names(baseline.authors, match.authors)
@@ -75,22 +74,20 @@ class BookSite:
                 value += 1/prop
         if baseline.subtitle != "":
             prop *= 2
-            if baseline.subtitle == match.subtitle:
-                value += 1/prop
+            value += (1/prop) *  self._evaluate_string_fields(baseline.subtitle.lower(), match.subtitle.lower())
         if baseline.series != "":
             prop *= 2
-            if baseline.series == match.series:
-                value += 1/prop
+            value += (1/prop) * self._evaluate_string_fields(baseline.series.lower(), match.series.lower())
         if baseline.description != "":
             prop *= 2
-            value += (1/prop) * self._evaluate_descriptions(baseline.description, match.description)
+            value += (1/prop) * self._evaluate_string_fields(baseline.description, match.description)
         if baseline.book_image != None:
             prop *= 2
             if baseline.book_image == match.book_image:
                 value += 1/prop
         if value > 0:
             value += 1/prop
-        return value
+        return value * 100
 
     def _evaluate_author_names(self, baseline, match):
         try:
@@ -98,7 +95,7 @@ class BookSite:
             for author in baseline:
                 current_best = 0
                 for author2 in match:
-                    result = self._compare_author_names(author.lower(), author2.lower())
+                    result = self._compare_strings(author.lower(), author2.lower())
                     if result > current_best:
                         current_best = result
                 total += current_best
@@ -109,7 +106,7 @@ class BookSite:
         except:
             return 0
 
-    def _compare_author_names(self, baseline, match):
+    def _compare_strings(self, baseline, match):
         try:
             author = baseline.split()
             author2 = match.split()
@@ -131,7 +128,7 @@ class BookSite:
         except:
             return 0
 
-    def _evaluate_descriptions(self, baseline, match):
+    def _evaluate_string_fields(self, baseline, match):
         try:
             value = 0
             b = baseline.split()

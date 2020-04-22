@@ -92,10 +92,10 @@ class BookSite:
     def _evaluate_author_names(self, baseline, match):
         try:
             total = 0
-            for author in baseline:
+            for author_1 in baseline:
                 current_best = 0
-                for author2 in match:
-                    result = self._compare_strings(author.lower(), author2.lower())
+                for author_2 in match:
+                    result = self._compare_strings(author_1.lower(), author_2.lower())
                     if result > current_best:
                         current_best = result
                 total += current_best

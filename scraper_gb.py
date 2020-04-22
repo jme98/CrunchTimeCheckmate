@@ -111,21 +111,21 @@ class GoogleBooks(BookSite):
         stuff = root.xpath("//span[@dir='ltr']")
         count = 0
         author_start = 0
-        aList = []
+        a_list = []
         for i in stuff:
             if ("author" in i.text.lower()):
                 author_start = count + 1
             count = count + 1
         
         while author_start != 0 and author_start != len(stuff) and "edition" not in stuff[author_start].text.lower() and "publisher" not in stuff[author_start].text.lower() and "illustrated by" not in stuff[author_start].text.lower():
-            aList.append(stuff[author_start].text)
+            a_list.append(stuff[author_start].text)
             author_start = author_start + 1
 
-        if len(aList) == 0:
+        if len(a_list) == 0:
             stuff = root.xpath("//span[@class='addmd']")
             for i in stuff:
-                aList.append(i.text[3:])
-        return aList
+                a_list.append(i.text[3:])
+        return a_list
 
     def _find_ready_for_sale(self, root):
         try:

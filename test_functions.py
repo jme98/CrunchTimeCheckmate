@@ -8,11 +8,16 @@ gb = 'books?id=30ZuZjVP7V0C'
 tb = 'TestBookStore/book_detail/781524243456/'
 
 #Test Suite
-slug = 'kb'
+slug = 'tb'
 site = get_book_site(slug)
-url = site.convert_book_id_to_url(kb)
+url = site.convert_book_id_to_url(tb)
 sbd = site.get_book_data_from_site(url)
-
-sbd2 = SiteBookData()
-sbd2.title = "boop"
-print(site.find_book_matches_at_site(sbd2))
+print("TEST 1:")
+print(site.slug)
+print("TEST 2:")
+sbd.pr()
+print("TEST 3:")
+#sbd = SiteBookData(isbn_13="", title="", authors=[])
+print(site.find_book_matches_at_site(sbd))
+print("TEST 4:")
+print(url)

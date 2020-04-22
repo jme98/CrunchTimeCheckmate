@@ -14,5 +14,5 @@ url = site.convert_book_id_to_url(kb)
 sbd = site.get_book_data_from_site(url)
 
 sbd2 = SiteBookData()
-sbd2.from_json(sbd.to_json())
-print(sbd.to_json())
+sbd2.title = "boop"
+print(site.find_book_matches_at_site(sbd2))

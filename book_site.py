@@ -108,23 +108,23 @@ class BookSite:
 
     def _compare_strings(self, baseline, match):
         try:
-            author = baseline.split()
-            author2 = match.split()
-            for word in author:
+            word_set_1 = baseline.split()
+            word_set_2 = match.split()
+            for word in word_set_1:
                 word.strip(",.'")
-            for word in author2:
+            for word in word_set_2:
                 word.strip(",.'")
             total = 0
-            for word in author:
+            for word_1 in word_set_1:
                 current_best = 0
-                for word2 in author2:
-                    if word == word2:
+                for word_2 in word_set_2:
+                    if word_1 == word_2:
                         current_best = 1
                 total += current_best
-            if (len(author) > len(author2)):
-                return total / len(author)
+            if (len(word_set_1) > len(word_set_2)):
+                return total / len(word_set_1)
             else:
-                return total / len(author2)
+                return total / len(word_set_2)
         except:
             return 0
 

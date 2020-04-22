@@ -13,6 +13,7 @@ import json, requests
 from PIL import Image
 
 class SiteBookData:
+    """Book details as gathered from a specific entry at a specific book site"""
     book_format = "" # DIGITAL, PRINT, or AUDIOBOOK
     book_image = None # Pillow image of cover
     book_image_url = "" # direct URL to cover
@@ -36,39 +37,43 @@ class SiteBookData:
         self.authors = authors
 
     def __str__(self):
-        mystr = self.title
-        mystr += " " + self.isbn_13
+        return_string = self.title
+        return_string += " " + self.isbn_13
         for a in self.authors:
-            mystr += " " + a
-        return mystr.strip(".,' ")
+            return_string += " " + a
+        return return_string.strip(".,' ")
 
     def pr(self):
-        mystr = "Format: " + self.book_format + "\n"
-        mystr += "Image Url: " + self.book_image_url + "\n"
-        mystr += "ISBN-13: " + self.isbn_13 + "\n\n"
-        mystr += "Description: \n" + self.description + "\n\n"
-        mystr += "Series: " + self.series + "\n"
-        mystr += "Title: " + self.title + "\n"
-        mystr += "Subtitle: " + self.subtitle + "\n"
-        mystr += "Authors: \n"
+        """Prints all identifying details of the book"""
+        print_string = "Format: " + self.book_format + "\n"
+        print_string += "Image Url: " + self.book_image_url + "\n"
+        print_string += "ISBN-13: " + self.isbn_13 + "\n\n"
+        print_string += "Description: \n" + self.description + "\n\n"
+        print_string += "Series: " + self.series + "\n"
+        print_string += "Title: " + self.title + "\n"
+        print_string += "Subtitle: " + self.subtitle + "\n"
+        print_string += "Authors: \n"
         for a in self.authors:
-            mystr += "    " + a.strip("., ") + "\n"
-        mystr += "Book ID: " + self.book_id + "\n"
-        mystr += "Site Slug: " + self.site_slug + "\n"
-        mystr += "URL: " + self.url + "\n"
-        mystr += "RFS: " + str(self.ready_for_sale) + "\n"
-        mystr += "Parse Status: " + self.parse_status + "\n"
-        mystr += "Extras:\n"
+            print_string += "    " + a.strip("., ") + "\n"
+        print_string += "Book ID: " + self.book_id + "\n"
+        print_string += "Site Slug: " + self.site_slug + "\n"
+        print_string += "URL: " + self.url + "\n"
+        print_string += "RFS: " + str(self.ready_for_sale) + "\n"
+        print_string += "Parse Status: " + self.parse_status + "\n"
+        print_string += "Extras:\n"
         for extra, value in self.extras.items():
-            mystr += "    " + extra + ": " + str(value) + "\n"
-        mystr += "\n\n"
-        print(mystr)
+            print_string += "    " + extra + ": " + str(value) + "\n"
+        print_string += "\n\n"
+        print(print_string)
         try:
             self.book_image.show()
         except:
             print("No cover image available.")
 
     def to_json(self):
+        """Converts SiteBookData JSON
+        in description, replaces '\\n' with '<br/>'
+        """
         description_lines = self.description.split("\n")
         description = ""
         for i in range(len(description_lines)):
@@ -76,49 +81,52 @@ class SiteBookData:
             if i != 0:
                 description += "<br/>"
             description += line
-        mystr = "{\n"
-        mystr += f'    "book_format" : "{self.book_format}",\n'
-        mystr += f'    "book_image_url" : "{self.book_image_url}",\n'
-        mystr += f'    "isbn_13" : "{self.isbn_13}",\n'
-        mystr += f'    "description" : "{description}",\n'
-        mystr += f'    "series" : "{self.series}",\n'
-        mystr += f'    "title" : "{self.title}",\n'
-        mystr += f'    "subtitle" : "{self.subtitle}",\n'
-        mystr += '    "authors" : [\n'
+        json_string = "{\n"
+        json_string += f'    "book_format" : "{self.book_format}",\n'
+        json_string += f'    "book_image_url" : "{self.book_image_url}",\n'
+        json_string += f'    "isbn_13" : "{self.isbn_13}",\n'
+        json_string += f'    "description" : "{description}",\n'
+        json_string += f'    "series" : "{self.series}",\n'
+        json_string += f'    "title" : "{self.title}",\n'
+        json_string += f'    "subtitle" : "{self.subtitle}",\n'
+        json_string += '    "authors" : [\n'
         for i in range(len(self.authors)):
             a = self.authors[i]
             if i != 0:
-                mystr += ",\n"
-            mystr += f'        "{a}"'
-        mystr += "\n    ],\n"
-        mystr += f'    "book_id" : "{self.book_id}",\n'
-        mystr += f'    "site_slug" : "{self.site_slug }",\n'
-        mystr += f'    "url" : "{self.url}",\n'
-        mystr += f'    "ready_for_sale" : "{(str(self.ready_for_sale)).upper()}",\n'
-        mystr += f'    "parse_status" : "{self.parse_status}",\n'
-        mystr += '    "extras" : {\n'
+                json_string += ",\n"
+            json_string += f'        "{a}"'
+        json_string += "\n    ],\n"
+        json_string += f'    "book_id" : "{self.book_id}",\n'
+        json_string += f'    "site_slug" : "{self.site_slug }",\n'
+        json_string += f'    "url" : "{self.url}",\n'
+        json_string += f'    "ready_for_sale" : "{(str(self.ready_for_sale)).upper()}",\n'
+        json_string += f'    "parse_status" : "{self.parse_status}",\n'
+        json_string += '    "extras" : {\n'
         trailingComma = False
         for extra, value in self.extras.items():
             if trailingComma:
-                mystr += ",\n"
+                json_string += ",\n"
             else:
                 trailingComma = True
-            mystr += f'        "{extra}" : "{str(value)}"'
-        mystr += "\n    }\n"
-        mystr += "}"
-        return mystr
+            json_string += f'        "{extra}" : "{str(value)}"'
+        json_string += "\n    }\n"
+        json_string += "}"
+        return json_string
 
     def from_json(self, blob):
-        jdict = json.loads(blob)
+        """Converts SiteBookData JSON
+        in description, replaces '<br/>' with '\\n'
+        """
+        json_dict = json.loads(blob)
 
-        self.book_format = jdict.get("book_format", "")
-        self.book_image_url = jdict.get("book_image_url", "")
+        self.book_format = json_dict.get("book_format", "")
+        self.book_image_url = json_dict.get("book_image_url", "")
         if self.book_image_url != "":
             rspns = requests.get(self.book_image_url, stream=True)
             rspns.raw.decode_content = True
             self.book_image = Image.open(rspns.raw)
-        self.isbn_13 = jdict.get("isbn_13", "")
-        self.description = jdict.get("description", "")
+        self.isbn_13 = json_dict.get("isbn_13", "")
+        self.description = json_dict.get("description", "")
 
         description_lines = self.description.split("<br/>")
         description = ""
@@ -129,13 +137,13 @@ class SiteBookData:
             description += line
         self.description = description
 
-        self.series = jdict.get("series", "")
-        self.title = jdict.get("title", "")
-        self.subtitle = jdict.get("subtitle", "")
-        self.authors = jdict.get("authors", [])
-        self.book_id = jdict.get("book_id", "")
-        self.site_slug = jdict.get("site_slug", "")
-        self.parse_status = jdict.get("parse_status", "")
-        self.url = jdict.get("url", "")
-        self.ready_for_sale = jdict.get("ready_for_sale", False)
-        self.extras = jdict.get("extras", {})
+        self.series = json_dict.get("series", "")
+        self.title = json_dict.get("title", "")
+        self.subtitle = json_dict.get("subtitle", "")
+        self.authors = json_dict.get("authors", [])
+        self.book_id = json_dict.get("book_id", "")
+        self.site_slug = json_dict.get("site_slug", "")
+        self.parse_status = json_dict.get("parse_status", "")
+        self.url = json_dict.get("url", "")
+        self.ready_for_sale = json_dict.get("ready_for_sale", False)
+        self.extras = json_dict.get("extras", {})

@@ -1,5 +1,8 @@
 from checkmate import *
 
+#produces a hard-coded SiteBookData object, retrieves a second SiteBookData object from the appropriate url, and
+#  compares them using the 'evaluate_potential_match' function from the 'BookSite' object (parent to 'LivrariaCultura')
+
 lc = 'bible-commentary-the-gospel-of-john-2012895340/p'
 
 slug = 'lc'

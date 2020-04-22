@@ -33,7 +33,7 @@ class TestBook(BookSite):
             if book_format != None:
                 if book_format[0] == "E":
                     return "DIGITAL"
-                elif book_format[0] == "A" and format_code not in ["A205", "A206", "A211", "A212"]:
+                elif book_format[0] == "A" and book_format not in ["A205", "A206", "A211", "A212"]:
                     return "AUDIOBOOK"
                 elif book_format[0] == "B":
                     return "PRINT"
@@ -92,7 +92,7 @@ class TestBook(BookSite):
         try:
             series = root.xpath("//strong[text()='Series Name:']")[0].tail[1:]
             if series != None:
-                if series_name == "N/A":
+                if series == "N/A":
                     return "" 
                 else:
                     return series

@@ -6,6 +6,7 @@ from scraper_tb import TestBook
 from objects import SiteBookData
 
 def get_book_site(slug):
+    """Converts a book site's slug into the corresponding BookSite object"""
     if slug == 'lc':
         return LivrariaCultura()
     elif slug == 'sd':

@@ -13,6 +13,7 @@ import json, requests
 from PIL import Image
 
 class SiteBookData:
+    """Book details as gathered from a specific entry at a specific book site"""
     book_format = "" # DIGITAL, PRINT, or AUDIOBOOK
     book_image = None # Pillow image of cover
     book_image_url = "" # direct URL to cover
@@ -43,6 +44,7 @@ class SiteBookData:
         return return_string.strip(".,' ")
 
     def pr(self):
+        """Prints all identifying details of the book"""
         print_string = "Format: " + self.book_format + "\n"
         print_string += "Image Url: " + self.book_image_url + "\n"
         print_string += "ISBN-13: " + self.isbn_13 + "\n\n"
@@ -69,6 +71,9 @@ class SiteBookData:
             print("No cover image available.")
 
     def to_json(self):
+        """Converts SiteBookData JSON
+        in description, replaces '\\n' with '<br/>'
+        """
         description_lines = self.description.split("\n")
         description = ""
         for i in range(len(description_lines)):
@@ -109,6 +114,9 @@ class SiteBookData:
         return json_string
 
     def from_json(self, blob):
+        """Converts SiteBookData JSON
+        in description, replaces '<br/>' with '\\n'
+        """
         json_dict = json.loads(blob)
 
         self.book_format = json_dict.get("book_format", "")

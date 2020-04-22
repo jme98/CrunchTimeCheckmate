@@ -9,6 +9,8 @@ BookSites are referenced as follows:
 """
 
 import string
+import json, requests
+from PIL import Image
 
 class SiteBookData:
     book_format = "" # DIGITAL, PRINT, or AUDIOBOOK
@@ -65,3 +67,75 @@ class SiteBookData:
             self.book_image.show()
         except:
             print("No cover image available.")
+
+    def to_json(self):
+        description_lines = self.description.split("\n")
+        description = ""
+        for i in range(len(description_lines)):
+            line = description_lines[i]
+            if i != 0:
+                description += "<br/>"
+            description += line
+        mystr = "{\n"
+        mystr += f'    "book_format" : "{self.book_format}",\n'
+        mystr += f'    "book_image_url" : "{self.book_image_url}",\n'
+        mystr += f'    "isbn_13" : "{self.isbn_13}",\n'
+        mystr += f'    "description" : "{description}",\n'
+        mystr += f'    "series" : "{self.series}",\n'
+        mystr += f'    "title" : "{self.title}",\n'
+        mystr += f'    "subtitle" : "{self.subtitle}",\n'
+        mystr += '    "authors" : [\n'
+        for i in range(len(self.authors)):
+            a = self.authors[i]
+            if i != 0:
+                mystr += ",\n"
+            mystr += f'        "{a}"'
+        mystr += "\n    ],\n"
+        mystr += f'    "book_id" : "{self.book_id}",\n'
+        mystr += f'    "site_slug" : "{self.site_slug }",\n'
+        mystr += f'    "url" : "{self.url}",\n'
+        mystr += f'    "ready_for_sale" : "{(str(self.ready_for_sale)).upper()}",\n'
+        mystr += f'    "parse_status" : "{self.parse_status}",\n'
+        mystr += '    "extras" : {\n'
+        trailingComma = False
+        for extra, value in self.extras.items():
+            if trailingComma:
+                mystr += ",\n"
+            else:
+                trailingComma = True
+            mystr += f'        "{extra}" : "{str(value)}"'
+        mystr += "\n    }\n"
+        mystr += "}"
+        return mystr
+
+    def from_json(self, blob):
+        jdict = json.loads(blob)
+
+        self.book_format = jdict.get("book_format", "")
+        self.book_image_url = jdict.get("book_image_url", "")
+        if self.book_image_url != "":
+            rspns = requests.get(self.book_image_url, stream=True)
+            rspns.raw.decode_content = True
+            self.book_image = Image.open(rspns.raw)
+        self.isbn_13 = jdict.get("isbn_13", "")
+        self.description = jdict.get("description", "")
+
+        description_lines = self.description.split("<br/>")
+        description = ""
+        for i in range(len(description_lines)):
+            line = description_lines[i]
+            if i != 0:
+                description += "\n"
+            description += line
+        self.description = description
+
+        self.series = jdict.get("series", "")
+        self.title = jdict.get("title", "")
+        self.subtitle = jdict.get("subtitle", "")
+        self.authors = jdict.get("authors", [])
+        self.book_id = jdict.get("book_id", "")
+        self.site_slug = jdict.get("site_slug", "")
+        self.parse_status = jdict.get("parse_status", "")
+        self.url = jdict.get("url", "")
+        self.ready_for_sale = jdict.get("ready_for_sale", False)
+        self.extras = jdict.get("extras", {})

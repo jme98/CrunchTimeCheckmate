@@ -30,6 +30,7 @@ class SiteBookData:
     page_content = "" #html content of the parsed page
     ready_for_sale = False # boolean; is this book currently purchasable at this site?
     extras = {} # dictionary of any other relevant data provided by the BookSite
+    ready_for_sale_str = "false" #string version of the ready_for_sale boolean
 
     def __init__(self, isbn_13="", title="", authors=[]):
         self.isbn_13 = isbn_13
@@ -147,3 +148,9 @@ class SiteBookData:
         self.url = json_dict.get("url", "")
         self.ready_for_sale = json_dict.get("ready_for_sale", False)
         self.extras = json_dict.get("extras", {})
+        
+    def ready_for_sale_string(self):
+        if self.ready_for_sale:
+            return "true"
+        else:
+            return "false"

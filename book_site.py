@@ -32,6 +32,10 @@ class BookSite:
         data.authors = self._find_authors(root)
         
         data.ready_for_sale = self._find_ready_for_sale(root)
+        if data.ready_for_sale:
+            data.ready_for_sale_str = "true"
+        else:
+            data.ready_for_sale_str = "false"
         data.book_id = url[len(self.base):]
         data.site_slug = self.slug
         data.url = url

@@ -5,11 +5,15 @@ BookSites are referenced as follows:
    gb = Google Books
    lc = LivrariaCultura
    sd = Scribd
+   ab = Audiobooks.com
 """
 
 import string
+import json, requests
+from PIL import Image
 
 class SiteBookData:
+    """Book details as gathered from a specific entry at a specific book site"""
     book_format = "" # DIGITAL, PRINT, or AUDIOBOOK
     book_image = None # Pillow image of cover
     book_image_url = "" # direct URL to cover
@@ -25,7 +29,8 @@ class SiteBookData:
     url = "" # final, direct URL to the book page
     page_content = "" #html content of the parsed page
     ready_for_sale = False # boolean; is this book currently purchasable at this site?
-    extra = {} # dictionary of any other relevant data provided by the BookSite
+    extras = {} # dictionary of any other relevant data provided by the BookSite
+    ready_for_sale_str = "false" #string version of the ready_for_sale boolean
 
     def __init__(self, isbn = '', title = '', authors = []):
         if len(isbn) == 10:
@@ -40,29 +45,34 @@ class SiteBookData:
         self.authors = authors
 
     def __str__(self):
-        mystr = self.title
-        mystr += " " + self.isbn_13
+        return_string = self.title
+        return_string += " " + self.isbn_13
         for a in self.authors:
-            mystr += " " + a
-        return mystr.strip(".,' ")
+            return_string += " " + a
+        return return_string.strip(".,' ")
 
     def pr(self):
-        mystr = "Format: " + self.book_format + "\n"
-        mystr += "Image Url: " + self.book_image_url + "\n"
-        mystr += "ISBN-13: " + self.isbn_13 + "\n\n"
-        mystr += "Description: \n" + self.description + "\n\n"
-        mystr += "Series: " + self.series + "\n"
-        mystr += "Title: " + self.title + "\n"
-        mystr += "Subtitle: " + self.subtitle + "\n"
-        mystr += "Authors: \n"
+        """Prints all identifying details of the book"""
+        print_string = "Format: " + self.book_format + "\n"
+        print_string += "Image Url: " + self.book_image_url + "\n"
+        print_string += "ISBN-13: " + self.isbn_13 + "\n\n"
+        print_string += "Description: \n" + self.description + "\n\n"
+        print_string += "Series: " + self.series + "\n"
+        print_string += "Title: " + self.title + "\n"
+        print_string += "Subtitle: " + self.subtitle + "\n"
+        print_string += "Authors: \n"
         for a in self.authors:
-            mystr += "    " + a.strip("., ") + "\n"
-        mystr += "Book ID: " + self.book_id + "\n"
-        mystr += "Site Slug: " + self.site_slug + "\n"
-        mystr += "URL: " + self.url + "\n"
-        mystr += "RFS: " + str(self.ready_for_sale) + "\n"
-        mystr += "Parse Status: " + self.parse_status + "\n\n\n"
-        print(mystr)
+            print_string += "    " + a.strip("., ") + "\n"
+        print_string += "Book ID: " + self.book_id + "\n"
+        print_string += "Site Slug: " + self.site_slug + "\n"
+        print_string += "URL: " + self.url + "\n"
+        print_string += "RFS: " + str(self.ready_for_sale) + "\n"
+        print_string += "Parse Status: " + self.parse_status + "\n"
+        print_string += "Extras:\n"
+        for extra, value in self.extras.items():
+            print_string += "    " + extra + ": " + str(value) + "\n"
+        print_string += "\n\n"
+        print(print_string)
         try:
             self.book_image.show()
         except:
@@ -94,16 +104,43 @@ get_book_site(slug)
 # type: (str) -> BookSite
 """Given a booksite slug, return a BookSite object corresponding to the slug"""
 
-book_site.get_book_data_from_site(url)
-# type: (str) -> SiteBookData
-"""Given a direct link to a book page at a site, parse it and return the SiteBookData of the info"""
+    def from_json(self, blob):
+        """Converts SiteBookData JSON
+        in description, replaces '<br/>' with '\\n'
+        """
+        json_dict = json.loads(blob)
 
-book_site.find_book_matches_at_site(book_data)
-# type: (SiteBookData) -> List[Tuple[SiteBookData, float]]
-"""Given a SiteBookData, search for the book at the ‘book_site’ site and provide a list of likely matches paired with how good of a match it is (1.0 is an exact match).
-   This should take into account all the info we have about a book, including the cover."""
+        self.book_format = json_dict.get("book_format", "")
+        self.book_image_url = json_dict.get("book_image_url", "")
+        if self.book_image_url != "":
+            rspns = requests.get(self.book_image_url, stream=True)
+            rspns.raw.decode_content = True
+            self.book_image = Image.open(rspns.raw)
+        self.isbn_13 = json_dict.get("isbn_13", "")
+        self.description = json_dict.get("description", "")
 
-book_site.convert_book_id_to_url(book_id)
-# type: (str) -> str
-"""Given a book_id, return the direct URL for the book."""
-'''
+        description_lines = self.description.split("<br/>")
+        description = ""
+        for i in range(len(description_lines)):
+            line = description_lines[i]
+            if i != 0:
+                description += "\n"
+            description += line
+        self.description = description
+
+        self.series = json_dict.get("series", "")
+        self.title = json_dict.get("title", "")
+        self.subtitle = json_dict.get("subtitle", "")
+        self.authors = json_dict.get("authors", [])
+        self.book_id = json_dict.get("book_id", "")
+        self.site_slug = json_dict.get("site_slug", "")
+        self.parse_status = json_dict.get("parse_status", "")
+        self.url = json_dict.get("url", "")
+        self.ready_for_sale = json_dict.get("ready_for_sale", False)
+        self.extras = json_dict.get("extras", {})
+        
+    def ready_for_sale_string(self):
+        if self.ready_for_sale:
+            return "true"
+        else:
+            return "false"

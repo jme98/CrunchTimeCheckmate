@@ -8,6 +8,38 @@ class Kobo(BookSite):
         self.slug = 'kb'
         self.base = 'https://www.kobo.com/us/en/'
         self.search = 'search'
+        
+    def find_book_matches_at_site(self, book_data):
+        search_string = book_data.title
+        for a in book_data.authors:
+            search_string += " " + a
+        search_string.strip(".,' ")
+
+        responses = []
+        responses.append(requests.get(self.base + self.search, params=self._construct_params_of_search(search_string)))
+        responses.append(requests.get(self.base + self.search, params=self._construct_params_of_search(book_data.isbn_13)))
+        roots = []
+        roots.append(etree.fromstring(responses[0].content, etree.HTMLParser()))
+        roots.append(etree.fromstring(responses[1].content, etree.HTMLParser()))
+        links = self._find_results_of_search(roots[0])
+        links += self._find_results_of_search(roots[1])
+        links = list(dict.fromkeys(links))
+
+        results = []
+        graded_results = []
+        for l in links:
+            results.append(self.get_book_data_from_site(l))
+        for result in results:
+            graded_results.append((result, self.evaluate_potential_match(book_data, result)))
+
+        empty = True
+        while (empty):
+            try:
+                graded_results.remove(('', 0))
+            except:
+                empty = False
+
+        return graded_results
 
     def _construct_params_of_search(self, book_data):
         return {"query":str(book_data)}
@@ -110,5 +142,9 @@ class Kobo(BookSite):
         return root.xpath('.//span[@class="authors product-field contributor-list"]/span[@class="visible-contributors"]/descendant::*/text()')
 
     def _find_ready_for_sale(self, root):
-        return True
+        try:
+            purchasable = root.xpath('.//button[@class="purchase-action buy-now"]/span')
+            return purchasable != []
+        except:
+            return ""
     #endregion

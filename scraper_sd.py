@@ -11,13 +11,13 @@ class Scribd(BookSite):
 
     #overriding super function because isbn-13 and title/author cannot be searched together on scribd
     def find_book_matches_at_site(self, book_data):
-        mystr = book_data.title
+        search_string = book_data.title
         for a in book_data.authors:
-            mystr += " " + a
-        mystr.strip(".,' ")
+            search_string += " " + a
+        search_string.strip(".,' ")
 
         responses = []
-        responses.append(requests.get(self.base + self.search, params=self._construct_params_of_search(mystr)))
+        responses.append(requests.get(self.base + self.search, params=self._construct_params_of_search(search_string)))
         responses.append(requests.get(self.base + self.search, params=self._construct_params_of_search(book_data.isbn_13)))
         roots = []
         roots.append(etree.fromstring(responses[0].content, etree.HTMLParser()))

@@ -32,6 +32,10 @@ class BookSite:
         data.authors = self._find_authors(root)
         
         data.ready_for_sale = self._find_ready_for_sale(root)
+        if data.ready_for_sale:
+            data.ready_for_sale_str = "true"
+        else:
+            data.ready_for_sale_str = "false"
         data.book_id = url[len(self.base):]
         data.site_slug = self.slug
         data.url = url
@@ -228,11 +232,32 @@ class BookSite:
         elif len(isbn) == 10:
             nine_digits = isbn[0:9] #slice off the old check digit
             final_isbn = "978"
-            final_isbn += (nine_digits)
+            final_isbn += nine_digits
             final_isbn += str(self._calc_check_digit(final_isbn))
             return final_isbn
         else:
             return ""
+    
+    def _calc_check_digit(self, isbn_string):
+        products = []
+        for i in range(0, 12):
+            if ((i + 1) % 2) != 0: #we are looking at the first, third, fifth ... digit
+                products.append(str(isbn_string[i] * 1))
+            else: #we are looking at the second, fourth, sixth ... digit
+                products.append(int(isbn_string[i] * 3))
+
+        accumulator = 0
+        for p in products:
+            accumulator += p
+
+        modulated = accumulator % 10
+
+        if modulated == 0:
+            check_digit = modulated
+        else:
+            check_digit = 10 - modulated
+
+        return check_digit
 
     def _calc_check_digit(self, isbn_string):
         """Return final digit of ISBN13"""

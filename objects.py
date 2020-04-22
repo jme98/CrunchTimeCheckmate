@@ -30,9 +30,17 @@ class SiteBookData:
     page_content = "" #html content of the parsed page
     ready_for_sale = False # boolean; is this book currently purchasable at this site?
     extras = {} # dictionary of any other relevant data provided by the BookSite
+    ready_for_sale_str = "false" #string version of the ready_for_sale boolean
 
-    def __init__(self, isbn_13="", title="", authors=[]):
-        self.isbn_13 = isbn_13
+    def __init__(self, isbn = '', title = '', authors = []):
+        if len(isbn) == 10:
+            nine_digits = isbn[0:9] #slice off the old check digit
+            final_isbn = "978"
+            final_isbn += nine_digits
+            final_isbn += self._calc_check_digit(final_isbn)
+            self.isbn_13 = final_isbn
+        else:
+            self.isbn_13 = isbn
         self.title = title
         self.authors = authors
 
@@ -70,48 +78,31 @@ class SiteBookData:
         except:
             print("No cover image available.")
 
-    def to_json(self):
-        """Converts SiteBookData JSON
-        in description, replaces '\\n' with '<br/>'
-        """
-        description_lines = self.description.split("\n")
-        description = ""
-        for i in range(len(description_lines)):
-            line = description_lines[i]
-            if i != 0:
-                description += "<br/>"
-            description += line
-        json_string = "{\n"
-        json_string += f'    "book_format" : "{self.book_format}",\n'
-        json_string += f'    "book_image_url" : "{self.book_image_url}",\n'
-        json_string += f'    "isbn_13" : "{self.isbn_13}",\n'
-        json_string += f'    "description" : "{description}",\n'
-        json_string += f'    "series" : "{self.series}",\n'
-        json_string += f'    "title" : "{self.title}",\n'
-        json_string += f'    "subtitle" : "{self.subtitle}",\n'
-        json_string += '    "authors" : [\n'
-        for i in range(len(self.authors)):
-            a = self.authors[i]
-            if i != 0:
-                json_string += ",\n"
-            json_string += f'        "{a}"'
-        json_string += "\n    ],\n"
-        json_string += f'    "book_id" : "{self.book_id}",\n'
-        json_string += f'    "site_slug" : "{self.site_slug }",\n'
-        json_string += f'    "url" : "{self.url}",\n'
-        json_string += f'    "ready_for_sale" : "{(str(self.ready_for_sale)).upper()}",\n'
-        json_string += f'    "parse_status" : "{self.parse_status}",\n'
-        json_string += '    "extras" : {\n'
-        trailingComma = False
-        for extra, value in self.extras.items():
-            if trailingComma:
-                json_string += ",\n"
-            else:
-                trailingComma = True
-            json_string += f'        "{extra}" : "{str(value)}"'
-        json_string += "\n    }\n"
-        json_string += "}"
-        return json_string
+    def _calc_check_digit(self, isbn_string):
+        products = []
+        for i in range(0, 12):
+            if ((i + 1) % 2) != 0: #we are looking at the first, third, fifth ... digit
+                products[i] = isbn_string[i] * 1
+            else: #we are looking at the second, fourth, sixth ... digit
+                products[i] = isbn_string[i] * 3
+
+        accumulator = 0
+        for p in products:
+            accumulator += p
+
+        modulated = accumulator % 10
+
+        if modulated == 0:
+            check_digit = modulated
+        else:
+            check_digit = 10 - modulated
+
+        return check_digit
+
+'''
+get_book_site(slug)
+# type: (str) -> BookSite
+"""Given a booksite slug, return a BookSite object corresponding to the slug"""
 
     def from_json(self, blob):
         """Converts SiteBookData JSON
@@ -147,3 +138,9 @@ class SiteBookData:
         self.url = json_dict.get("url", "")
         self.ready_for_sale = json_dict.get("ready_for_sale", False)
         self.extras = json_dict.get("extras", {})
+        
+    def ready_for_sale_string(self):
+        if self.ready_for_sale:
+            return "true"
+        else:
+            return "false"
